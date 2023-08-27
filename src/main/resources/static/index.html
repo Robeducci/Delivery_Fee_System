@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Set Delivery</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="menu">
+            <form id="inputForm" action="/delivery" method="post">
+            <label for="station">Choose a City:</label>
+
+            <select name="station" id="station" class="select">
+                <option value="26038">Tallinn</option>
+                <option value="26242">Tartu</option>
+                <option value="41803">Pärnu</option>
+            </select>
+            <label for="vehicle">Choose a Vehicle:</label>
+
+            <select name="vehicle" id="vehicle" class="select">
+                <option value="car">car</option>
+                <option value="scooter">scooter</option>
+                <option value="bike">bike</option>
+            </select>
+                <button type="submit" >Submit</button>
+            </form>
+        </div>
+    </body>
+</html>

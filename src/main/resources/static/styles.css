@@ -1,0 +1,12 @@
+.menu {
+    text-align: center;
+    margin: auto;
+    padding: 1ch;
+}
+
+.select {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+}
