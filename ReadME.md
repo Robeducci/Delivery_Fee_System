@@ -8,7 +8,7 @@ In Intellij you can change it under:
 `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` 
 
 After this the project should configure correctly.  
-Go to `build.gradle` and on the right top corner there's a gradle reload button.
+Go to `build.gradle` and on the right top corner there's a gradle reload button or use `Ctrl+Shift+O`
 ____
 ### Running the project:
 `.\gradlew clean` (Optional)   
