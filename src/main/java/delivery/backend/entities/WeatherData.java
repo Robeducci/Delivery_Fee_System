@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -29,7 +30,7 @@ public class WeatherData {
 
     private String phenomenon;
 
-    private BigInteger timestamp;
+    private LocalDateTime timestamp;
 
 
     /**
@@ -47,7 +48,7 @@ public class WeatherData {
      * @param timestamp Time at which these recordings were taken at the weather station.
      */
     public WeatherData(String stationName, Integer wmoCode, double airTemp,
-                       double windSpeed, String phenomenon, BigInteger timestamp) {
+                       double windSpeed, String phenomenon, LocalDateTime timestamp) {
         this.stationName = stationName;
         this.wmoCode = wmoCode;
         this.airTemp = airTemp;

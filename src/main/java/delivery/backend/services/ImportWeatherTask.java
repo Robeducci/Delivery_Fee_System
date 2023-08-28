@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +107,8 @@ public class ImportWeatherTask {
     private WeatherData createWeatherDataFromImport(List<Node> stationData, BigInteger timeStamp) {
 
         WeatherData weatherData = new WeatherData();
-        weatherData.setTimestamp(timeStamp);
+        weatherData.setTimestamp(LocalDateTime
+                .ofInstant(Instant.ofEpochSecond(timeStamp.longValue()), ZoneId.of("Europe/Tallinn")));
 
         for (Node attribute : stationData) {
             switch (attribute.getNodeName()) {

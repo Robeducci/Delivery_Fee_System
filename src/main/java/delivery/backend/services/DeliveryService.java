@@ -5,8 +5,15 @@ import delivery.backend.entities.WeatherData;
 import delivery.backend.enums.Station;
 import delivery.backend.enums.Vehicle;
 import delivery.backend.exceptions.ForbiddenUsageOfVehicleException;
+import delivery.backend.exceptions.WrongDateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Service
 public class DeliveryService {
@@ -41,9 +48,19 @@ public class DeliveryService {
      * @param delivery object with the chosen station (city) and vehicle type for this delivery.
      * @return Error message or the calculated delivery fee.
      */
-    public String calculateDeliveryFee(Delivery delivery) {
-        WeatherData weatherData =
-                weatherService.getLatestWeatherReportByStation(delivery.getStation().getWmoCode());
+    public String calculateDeliveryFee(Delivery delivery, Optional<String> date) {
+
+        WeatherData weatherData;
+
+        if (date.isEmpty()) {
+            weatherData = weatherService.getLatestWeatherReportByStation(delivery.getStation().getWmoCode());
+        } else {
+            weatherData = weatherService.getClosestWeatherReportToDateByStation(delivery.getStation().getWmoCode(), date.get());
+            if (weatherData == null) {
+                throw new WrongDateException("We dont have weather data for this date. " +
+                        "Our nearest weather data is more than 2 days apart");
+            }
+        }
 
         double rbf = getRegionalBaseFee(delivery);
         double atef;

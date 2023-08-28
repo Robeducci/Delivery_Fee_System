@@ -3,11 +3,18 @@ package delivery.backend.controllers;
 import delivery.backend.entities.Delivery;
 import delivery.backend.exceptions.StationNotFoundException;
 import delivery.backend.exceptions.WeatherDataNotFoundException;
+import delivery.backend.exceptions.WrongDateException;
 import delivery.backend.services.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
 
 @RestController
@@ -35,13 +42,23 @@ public class DeliveryController {
      */
     @PostMapping("/delivery")
     public String getDeliveryFee(@RequestParam(name = "station") String wmoCode,
-                                      @RequestParam(name = "vehicle") String vehicle) {
+                                 @RequestParam(name = "vehicle") String vehicle,
+                                 @RequestParam(required = false, name = "date") String date) {
         try {
             Delivery delivery = new Delivery(wmoCode, vehicle);
+            System.out.println(date + ": DATE HERE");
+            if (date == null || date.isEmpty()) {
+                return deliveryService.calculateDeliveryFee(delivery, Optional.empty());
+            } else if (LocalDateTime.now().isBefore(LocalDateTime.parse(date))) {
+                throw new WrongDateException("Please do not select a future date.");
+            } else {
+                return deliveryService.calculateDeliveryFee(delivery, Optional.of(date));
+            }
 
-            return deliveryService.calculateDeliveryFee(delivery);
         } catch (WeatherDataNotFoundException | StationNotFoundException e) {
             return "Encountered an Error. Please try again.";
+        } catch (WrongDateException e) {
+            return e.getMessage();
         }
     }
 }

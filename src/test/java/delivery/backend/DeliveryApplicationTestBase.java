@@ -11,6 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +43,9 @@ public class DeliveryApplicationTestBase {
     protected static final String SCOOTER = "scooter";
     protected static final String BIKE = "bike";
 
+    protected static final LocalDateTime BASEDATE = LocalDateTime
+            .ofInstant(Instant.ofEpochSecond(1693131973L), ZoneId.of("Europe/Tallinn"));
+
     @BeforeEach
     void setUp() {
         weatherRepository.deleteAll();
@@ -48,15 +54,15 @@ public class DeliveryApplicationTestBase {
     protected void saveGoodWeatherDataToDatabase() {
         WeatherData tallinnData
                 = new WeatherData("Tallinn-Harku", 26038,
-                20.0, 2.0, "Overcast", BigInteger.valueOf( 1693131973L));
+                20.0, 2.0, "Overcast", BASEDATE);
 
         WeatherData tartuData
                 = new WeatherData("Tartu-Tõravere", 26242,
-                20.0, 2.0, "Overcast", BigInteger.valueOf( 1693131973L));
+                20.0, 2.0, "Overcast", BASEDATE);
 
         WeatherData parnuData
                 = new WeatherData("Pärnu", 41803,
-                20.0, 2.0, "Overcast", BigInteger.valueOf( 1693131973L));
+                20.0, 2.0, "Overcast", BASEDATE);
 
         List<WeatherData> data = new ArrayList<>(Arrays.asList(tallinnData, tartuData, parnuData));
 
@@ -66,15 +72,15 @@ public class DeliveryApplicationTestBase {
     protected void saveBadWeatherDataToDatabase() {
         WeatherData tallinnData
                 = new WeatherData("Tallinn-Harku", 26038,
-                -2.0, 2.0, "Rain fall", BigInteger.valueOf( 1693131973L));
+                -2.0, 2.0, "Rain fall", BASEDATE);
 
         WeatherData tartuData
                 = new WeatherData("Tartu-Tõravere", 26242,
-                20.0, 12.0, "Snow fall", BigInteger.valueOf( 1693131973L));
+                20.0, 12.0, "Snow fall", BASEDATE);
 
         WeatherData parnuData
                 = new WeatherData("Pärnu", 41803,
-                -20.0, 2.0, "Overcast", BigInteger.valueOf( 1693131973L));
+                -20.0, 2.0, "Overcast", BASEDATE);
 
         List<WeatherData> data = new ArrayList<>(Arrays.asList(tallinnData, tartuData, parnuData));
 
@@ -84,13 +90,13 @@ public class DeliveryApplicationTestBase {
     protected void saveWorseWeatherDataToDatabase() {
         WeatherData tallinnData
                 = new WeatherData("Tallinn-Harku", 26038,
-                -2.0, 2.0, "Thunder", BigInteger.valueOf( 1693131973L));
+                -2.0, 2.0, "Thunder", BASEDATE);
         WeatherData tartuData
                 = new WeatherData("Tartu-Tõravere", 26242,
-                20.0, 12.0, "Glaze and hail", BigInteger.valueOf( 1693131973L));
+                20.0, 12.0, "Glaze and hail", BASEDATE);
         WeatherData parnuData
                 = new WeatherData("Pärnu", 41803,
-                20.0, 22.0, "Snow fall", BigInteger.valueOf( 1693131973L));
+                20.0, 22.0, "Snow fall", BASEDATE);
 
         List<WeatherData> data = new ArrayList<>(Arrays.asList(tallinnData, tartuData, parnuData));
 
