@@ -2,15 +2,13 @@ package delivery.backend;
 
 import delivery.backend.entities.WeatherData;
 import delivery.backend.repositories.WeatherRepository;
-import delivery.backend.services.DeliveryService;
-import delivery.backend.services.ImportWeatherTask;
+import delivery.backend.services.ImportWeatherService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -25,13 +23,15 @@ public class DeliveryApplicationTestBase {
     @Autowired
     protected MockMvc mockMvc;
     @Autowired
-    protected ImportWeatherTask importWeatherTask;
-    @Autowired
-    protected DeliveryService deliveryService;
+    protected ImportWeatherService importWeatherService;
     @Autowired
     protected WeatherRepository weatherRepository;
 
-    protected static final String ERRORANSWER = "Encountered an Error. Please try again.";
+    protected static final String WEATHERDATANOTFOUNDERROR = "Did not find weather data for station";
+    protected static final String DATESTOOFARAPARTERROR = "We can't calculate fee for this date." +
+            " Our closest weather data is more than 1 day apart";
+    protected static final String FUTUREDATEERROR = "Please do not select a future date";
+    protected static final String STATIONNOTFOUNDERROR = "Weather station for this city was not found";
     protected static final String FORBIDDENERROR = "Usage of selected vehicle type is forbidden";
 
     protected static final String TALLINN = "26038";
@@ -103,4 +103,30 @@ public class DeliveryApplicationTestBase {
         weatherRepository.saveAll(data);
     }
 
+    protected void saveDifferentDatesDifferentWeather() {
+
+        WeatherData tallinnData1
+                = new WeatherData("Tallinn-Harku", 26038,
+                8.0, 2.0, "Rain fall",  LocalDateTime.of(2023, 6, 15, 15, 15));
+        WeatherData tallinnData2
+                = new WeatherData("Tallinn-Harku", 26038,
+                -2.0, 2.0, "Snow",  LocalDateTime.of(2023, 6, 30, 15, 15));
+        WeatherData tallinnData3
+                = new WeatherData("Tallinn-Harku", 26038,
+                10.0, 15.0, "Thunder",  LocalDateTime.of(2023, 7, 15, 11, 15));
+        WeatherData tallinnData4
+                = new WeatherData("Tallinn-Harku", 26038,
+                10.0, 15.0, "Overcast",  LocalDateTime.of(2023, 7, 15, 12, 15));
+        WeatherData tallinnData5
+                = new WeatherData("Tallinn-Harku", 26038,
+                -2.0, 2.0, "Overcast",  LocalDateTime.of(2023, 7, 30, 15, 15));
+        WeatherData tallinnData6
+                = new WeatherData("Tallinn-Harku", 26038,
+                -15.0, 2.0, "Overcast",  LocalDateTime.of(2023, 8, 15, 15, 15));
+
+        List<WeatherData> data = new ArrayList<>(Arrays.asList(tallinnData1, tallinnData2, tallinnData3,
+                tallinnData4, tallinnData5, tallinnData6));
+
+        weatherRepository.saveAll(data);
+    }
 }

@@ -3,23 +3,18 @@ package delivery.backend.services;
 import delivery.backend.entities.Delivery;
 import delivery.backend.entities.WeatherData;
 import delivery.backend.enums.Station;
-import delivery.backend.enums.Vehicle;
 import delivery.backend.exceptions.ForbiddenUsageOfVehicleException;
 import delivery.backend.exceptions.WrongDateException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class DeliveryService {
 
-    @Autowired
-    private WeatherService weatherService;
+    private final WeatherService weatherService;
 
     private static final double BASEFEE4 = 4;
     private static final double BASEFEE35 = 3.5;
@@ -29,6 +24,7 @@ public class DeliveryService {
 
     private static final double EXTRAFEE1 = 1;
     private static final double EXTRAFEE05 = 0.5;
+
 
 
     /**
@@ -48,50 +44,26 @@ public class DeliveryService {
      * @param delivery object with the chosen station (city) and vehicle type for this delivery.
      * @return Error message or the calculated delivery fee.
      */
-    public String calculateDeliveryFee(Delivery delivery, Optional<String> date) {
+    public String calculateDeliveryFee(Delivery delivery, Optional<String> date)
+            throws ForbiddenUsageOfVehicleException, WrongDateException {
 
-        WeatherData weatherData;
+        WeatherData weatherData = weatherService.getWeatherData(delivery.getStation().getWmoCode(), date);
 
-        if (date.isEmpty()) {
-            weatherData = weatherService.getLatestWeatherReportByStation(delivery.getStation().getWmoCode());
-        } else {
-            weatherData = weatherService.getClosestWeatherReportToDateByStation(delivery.getStation().getWmoCode(), date.get());
-            if (weatherData == null) {
-                throw new WrongDateException("We dont have weather data for this date. " +
-                        "Our nearest weather data is more than 2 days apart");
-            }
+        double fee = getRegionalBaseFee(delivery);
+        double atef = calculateAirTemperatureFee(weatherData.getAirTemp());
+        double wpef = calculateWeatherPhenomenon(weatherData.getPhenomenon().toLowerCase());
+        double wsef = calculateWindSpeedFee(weatherData.getWindSpeed());
+
+        switch (delivery.getVehicle()) {
+            case SCOOTER -> fee += atef + wpef;
+            case BIKE -> fee += atef + wsef + wpef;
         }
-
-        double rbf = getRegionalBaseFee(delivery);
-        double atef;
-        double wsef = 0;
-        double wpef;
-
-        if (delivery.getVehicle() == Vehicle.CAR) {
-            return rbf + " €";
-        }
-        if (delivery.getVehicle() == Vehicle.BIKE) {
-            try {
-                wsef = calculateWindSpeedFee(weatherData.getWindSpeed());
-            } catch (ForbiddenUsageOfVehicleException e) {
-                return e.getMessage();
-            }
-        }
-        atef = calculateAirTemperatureFee(weatherData.getAirTemp());
-
-        try {
-            wpef = calculateWeatherPhenomenon(weatherData.getPhenomenon().toLowerCase());
-        } catch (ForbiddenUsageOfVehicleException e) {
-            return e.getMessage();
-        }
-
-        double fee = rbf + atef + wsef + wpef;
-
 
         return fee + " €";
     }
 
     private double getRegionalBaseFee(Delivery delivery) {
+
         if (delivery.getStation() == Station.TALLINN) {
             return switch (delivery.getVehicle()) {
                 case CAR -> BASEFEE4;
@@ -114,34 +86,37 @@ public class DeliveryService {
     }
 
     private double calculateAirTemperatureFee(double airTemp) {
-        double atef = 0;
+
         if (airTemp < -10) {
-            atef = EXTRAFEE1;
-        } else if (-10 <= airTemp && 0 >= airTemp) {
-            atef = EXTRAFEE05;
+            return EXTRAFEE1;
+        } else if (-10 <= airTemp && airTemp <= 0) {
+            return EXTRAFEE05;
+        } else {
+            return 0;
         }
-        return atef;
     }
 
-    private double calculateWindSpeedFee(double windSpeed) {
-        double wsef = 0;
-        if (10 <= windSpeed && 20 >= windSpeed) {
-            wsef = EXTRAFEE05;
+    private double calculateWindSpeedFee(double windSpeed) throws ForbiddenUsageOfVehicleException {
+
+        if (10 <= windSpeed && windSpeed <= 20) {
+            return EXTRAFEE05;
         } else if (windSpeed > 20) {
             throw new ForbiddenUsageOfVehicleException("Usage of selected vehicle type is forbidden");
+        } else {
+            return 0;
         }
-        return wsef;
     }
 
-    private double calculateWeatherPhenomenon(String phenomenon) {
-        double wpef = 0;
+    private double calculateWeatherPhenomenon(String phenomenon) throws ForbiddenUsageOfVehicleException {
+
         if (phenomenon.contains("rain")) {
-            wpef = EXTRAFEE05;
+            return EXTRAFEE05;
         } else if (phenomenon.contains("snow") || phenomenon.contains("sleet")) {
-            wpef = EXTRAFEE1;
+            return EXTRAFEE1;
         } else if (phenomenon.contains("glaze") || phenomenon.contains("hail") || phenomenon.contains("thunder")) {
             throw new ForbiddenUsageOfVehicleException("Usage of selected vehicle type is forbidden");
+        } else {
+            return 0;
         }
-        return wpef;
     }
 }

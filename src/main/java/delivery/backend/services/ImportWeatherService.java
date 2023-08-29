@@ -3,7 +3,7 @@ package delivery.backend.services;
 import delivery.backend.entities.WeatherData;
 import delivery.backend.repositories.WeatherRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
-public class ImportWeatherTask {
+@RequiredArgsConstructor
+public class ImportWeatherService {
 
-    @Autowired
-    private WeatherRepository weatherRepository;
+    private final WeatherRepository weatherRepository;
 
     private final List<String> importantDataNames
             = new ArrayList<>(Arrays.asList("name", "wmocode", "airtemperature", "windspeed", "phenomenon"));
@@ -44,7 +44,8 @@ public class ImportWeatherTask {
 
     private final String weatherUrl = "https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php";
 
-    private final Logger logger = Logger.getLogger(ImportWeatherTask.class.getName());
+    private final Logger logger = Logger.getLogger(ImportWeatherService.class.getName());
+
 
     /**
      * Importing wheather data for certain stations from "www.ilmateenistus.ee".

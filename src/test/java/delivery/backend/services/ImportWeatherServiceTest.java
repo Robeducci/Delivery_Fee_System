@@ -5,17 +5,13 @@ import delivery.backend.entities.WeatherData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class ImportWeatherTaskTest extends DeliveryApplicationTestBase {
+class ImportWeatherServiceTest extends DeliveryApplicationTestBase {
 
     @Test
     void testImportWeatherData() {
         Assertions.assertEquals(0, weatherRepository.findAll().size());
 
-        importWeatherTask.importWeatherData();
+        importWeatherService.importWeatherData();
 
         Assertions.assertEquals(3, weatherRepository.findAll().size());
 

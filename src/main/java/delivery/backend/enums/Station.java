@@ -8,9 +8,9 @@ import java.util.Optional;
 /**
  * Stations.
  *
- * The different stations near cities we are able to do deliveries.
+ * The different stations near cities we are doing deliveries in.
  *
- * Consists of CITY("weather station")
+ * Consists of CITY(wmo code of station)
  */
 public enum Station {
 
@@ -46,6 +46,6 @@ public enum Station {
                 .findFirst();
 
         return Optional.of(expectedStation).get()
-                .orElseThrow(()-> {throw new StationNotFoundException("Cant find Station");});
+                .orElseThrow(()-> {throw new StationNotFoundException("Weather station for this city was not found");});
     }
 }

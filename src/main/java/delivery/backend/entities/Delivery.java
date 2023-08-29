@@ -16,13 +16,12 @@ public class Delivery {
     /**
      * Delivery object.
      *
-     * Has two fields: Enum Station and Enum Vehicle
+     * Has two fields: Station and Vehicle
      *
-     * Enums are used so no random stations or vehicles can be got,
-     * and it is easy to add new stations or vehicle types when needed
+     * Enums are used so no random stations or vehicles can be used.
      *
      * @param wmoCode The wmo code of the nearest station to the chosen city.
-     * @param vehicle Type of the vehicle the customer has chosen for the deliverer.
+     * @param vehicle Type of the vehicle for the deliverer.
      */
     public Delivery(String wmoCode, String vehicle)  {
         this.station = Station.fromWmoCode(Integer.parseInt(wmoCode));
