@@ -2,8 +2,8 @@
 _____
 
 ### Problems:
-Problem when configuring root project - This project uses Java 17, make sure your JAVA_HOME or Gradle JVM is set to
-17 or higher and that Gradle JVM is set to Java 17 or higher.
+Problem when configuring root project - This project uses Java 17, make sure your Java and Gradle JVM is set to
+17 or higher.
 
 In Intellij you can change it under:  
 `File > Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` 
