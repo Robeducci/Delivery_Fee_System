@@ -39,7 +39,7 @@ public enum Station {
      * @param wmoCode The wmo code of the weather station.
      * @return The city near the weather station
      */
-    public static Station fromWmoCode(int wmoCode) {
+    public static Station fromWmoCode(int wmoCode) throws StationNotFoundException {
 
         Optional<Station> expectedStation = Arrays.stream(Station.values())
                 .filter(station -> station.getWmoCode() == wmoCode)

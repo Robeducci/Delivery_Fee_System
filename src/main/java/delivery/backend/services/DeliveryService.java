@@ -1,5 +1,6 @@
 package delivery.backend.services;
 
+import delivery.backend.constants.Constants;
 import delivery.backend.entities.Delivery;
 import delivery.backend.entities.WeatherData;
 import delivery.backend.enums.Station;
@@ -16,17 +17,6 @@ public class DeliveryService {
 
     private final WeatherService weatherService;
 
-    private static final double BASEFEE4 = 4;
-    private static final double BASEFEE35 = 3.5;
-    private static final double BASEFEE3 = 3;
-    private static final double BASEFEE25 = 2.5;
-    private static final double BASEFEE2 = 2;
-
-    private static final double EXTRAFEE1 = 1;
-    private static final double EXTRAFEE05 = 0.5;
-
-
-
     /**
      * Method for calculating delivery fee based on city (station wmo code), vehicle type and weather conditions.
      *
@@ -34,15 +24,18 @@ public class DeliveryService {
      *
      * We need to calculate: (Extra fees apply to certain vehicle types)
      *      - rbf (regional base fee)             - base fee for certain vehicle types in certain cities.
-     *      - atef (air temperature extra fee)    - (Bike and Scooter) based on how cold it is, we add extra fee.
-     *      - wsef (wind speed extra fee)         - (Bike) if it is windy then an extra fee is added. If it is too
-     *                                              windy then it is too dangerous to deliver using this vehicle type.
+     *      - atef (air temperature extra fee)    - (Bike and Scooter) based on how cold it is, extra fee is added.
+     *      - wsef (wind speed extra fee)         - (Bike) if it is windy then an extra fee is added. If it is too windy
+     *                                              then it is too dangerous to deliver using the chosen vehicle type.
      *      - wpef (weather phenomenon extra fee) - (Bike and Scooter) Snow, sleet and rain give extra fees.
      *                                              Glaze, hail and thunder are too dangerous to make deliveries
      *                                              in using these certain vehicle types.
      *
-     * @param delivery object with the chosen station (city) and vehicle type for this delivery.
+     * @param delivery Object with the chosen station (city) and vehicle type for this delivery.
+     * @param date Optional parameter. If a date is chosen then the fee will be calculated based on the chosen date.
      * @return Error message or the calculated delivery fee.
+     * @throws ForbiddenUsageOfVehicleException Thrown when weather conditions are too dangerous for vehicle type.
+     * @throws WrongDateException Thrown when the chosen date is too far apart with the closest weather data.
      */
     public String calculateDeliveryFee(Delivery delivery, Optional<String> date)
             throws ForbiddenUsageOfVehicleException, WrongDateException {
@@ -66,31 +59,31 @@ public class DeliveryService {
 
         if (delivery.getStation() == Station.TALLINN) {
             return switch (delivery.getVehicle()) {
-                case CAR -> BASEFEE4;
-                case SCOOTER -> BASEFEE35;
-                case BIKE -> BASEFEE3;
+                case CAR -> Constants.BASEFEE4;
+                case SCOOTER -> Constants.BASEFEE35;
+                case BIKE -> Constants.BASEFEE3;
             };
         } else if (delivery.getStation() == Station.TARTU) {
             return switch (delivery.getVehicle()) {
-                case CAR -> BASEFEE35;
-                case SCOOTER -> BASEFEE3;
-                case BIKE -> BASEFEE25;
+                case CAR -> Constants.BASEFEE35;
+                case SCOOTER -> Constants.BASEFEE3;
+                case BIKE -> Constants.BASEFEE25;
             };
         } else {
             return switch (delivery.getVehicle()) {
-                case CAR -> BASEFEE3;
-                case SCOOTER -> BASEFEE25;
-                case BIKE -> BASEFEE2;
+                case CAR -> Constants.BASEFEE3;
+                case SCOOTER -> Constants.BASEFEE25;
+                case BIKE -> Constants.BASEFEE2;
             };
         }
     }
 
     private double calculateAirTemperatureFee(double airTemp) {
 
-        if (airTemp < -10) {
-            return EXTRAFEE1;
-        } else if (-10 <= airTemp && airTemp <= 0) {
-            return EXTRAFEE05;
+        if (airTemp < Constants.MINAIRTEMP) {
+            return Constants.EXTRAFEE1;
+        } else if (Constants.MINAIRTEMP <= airTemp && airTemp <= 0) {
+            return Constants.EXTRAFEE05;
         } else {
             return 0;
         }
@@ -98,9 +91,9 @@ public class DeliveryService {
 
     private double calculateWindSpeedFee(double windSpeed) throws ForbiddenUsageOfVehicleException {
 
-        if (10 <= windSpeed && windSpeed <= 20) {
-            return EXTRAFEE05;
-        } else if (windSpeed > 20) {
+        if (Constants.MINWINDSPEED <= windSpeed && windSpeed <= Constants.MAXWINDSPEED) {
+            return Constants.EXTRAFEE05;
+        } else if (windSpeed > Constants.MAXWINDSPEED) {
             throw new ForbiddenUsageOfVehicleException("Usage of selected vehicle type is forbidden");
         } else {
             return 0;
@@ -110,9 +103,9 @@ public class DeliveryService {
     private double calculateWeatherPhenomenon(String phenomenon) throws ForbiddenUsageOfVehicleException {
 
         if (phenomenon.contains("rain")) {
-            return EXTRAFEE05;
+            return Constants.EXTRAFEE05;
         } else if (phenomenon.contains("snow") || phenomenon.contains("sleet")) {
-            return EXTRAFEE1;
+            return Constants.EXTRAFEE1;
         } else if (phenomenon.contains("glaze") || phenomenon.contains("hail") || phenomenon.contains("thunder")) {
             throw new ForbiddenUsageOfVehicleException("Usage of selected vehicle type is forbidden");
         } else {

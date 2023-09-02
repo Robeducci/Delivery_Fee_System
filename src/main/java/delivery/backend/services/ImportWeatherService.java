@@ -1,5 +1,6 @@
 package delivery.backend.services;
 
+import delivery.backend.constants.Constants;
 import delivery.backend.entities.WeatherData;
 import delivery.backend.repositories.WeatherRepository;
 import jakarta.annotation.PostConstruct;
@@ -36,19 +37,11 @@ public class ImportWeatherService {
 
     private final WeatherRepository weatherRepository;
 
-    private final List<String> importantDataNames
-            = new ArrayList<>(Arrays.asList("name", "wmocode", "airtemperature", "windspeed", "phenomenon"));
-
-    private final List<String> importantStationNames
-            = new ArrayList<>(Arrays.asList("Tallinn-Harku", "Tartu-Tõravere", "Pärnu"));
-
-    private final String weatherUrl = "https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php";
-
     private final Logger logger = Logger.getLogger(ImportWeatherService.class.getName());
 
 
     /**
-     * Importing wheather data for certain stations from "www.ilmateenistus.ee".
+     * Importing weather data for certain stations from "www.ilmateenistus.ee".
      *
      * This task runs first when the application has started and then every hour at 15 minutes.
      *
@@ -56,7 +49,7 @@ public class ImportWeatherService {
      * A Document is created from the URLConnection's inputStream.
      * From the Document we take:
      *           - TimeStamp - Time at which the weather recordings were taken.
-     *           - Stations  - Only stations that are near cities we deliver in.
+     *           - Stations  - Only stations that are near cities deliveries are made in.
      *
      * Then only the data needed for calculations are saved into the database as WeatherData object.
      */
@@ -64,7 +57,7 @@ public class ImportWeatherService {
     @Scheduled(cron = "0 15 * * * *")
     public void importWeatherData() {
         try {
-            URLConnection urlConnection = new URL(weatherUrl).openConnection();
+            URLConnection urlConnection = new URL(Constants.WEATHERURL).openConnection();
             urlConnection.addRequestProperty("Accept", "application/xml");
 
 
@@ -77,7 +70,7 @@ public class ImportWeatherService {
             List<Node> stations = IntStream.range(0, stationNodes.getLength())
                     .mapToObj(stationNodes::item)
                     .filter(Node::hasChildNodes)
-                    .filter(s -> importantStationNames.contains(s.getChildNodes().item(1).getTextContent()))
+                    .filter(s -> Constants.STATIONNAMES.contains(s.getChildNodes().item(1).getTextContent()))
                     .collect(Collectors.toList());
 
             saveWeatherData(stations, timestamp);
@@ -87,7 +80,7 @@ public class ImportWeatherService {
             logger.log(Level.INFO, "WEATHER DATA: Imported weather data at: " + dtf.format(now));
 
         } catch (IOException | ParserConfigurationException | SAXException e) {
-            logger.log(Level.WARNING, "Weather info was not imported. Encountered an error", e);
+            logger.log(Level.WARNING, "Weather info was not imported. Encountered an error: ", e);
         }
     }
 
@@ -97,7 +90,7 @@ public class ImportWeatherService {
             List<Node> stationData = IntStream.range(0, station.getChildNodes().getLength())
                     .mapToObj(station.getChildNodes()::item)
                     .filter(node -> !Objects.equals(node.getNodeName(), "#text")
-                            && importantDataNames.contains(node.getNodeName()))
+                            && Constants.IMPORTANTDATAKEYS.contains(node.getNodeName()))
                     .collect(Collectors.toList());
 
             WeatherData weatherData = createWeatherDataFromImport(stationData, timeStamp);
@@ -111,13 +104,13 @@ public class ImportWeatherService {
         weatherData.setTimestamp(LocalDateTime
                 .ofInstant(Instant.ofEpochSecond(timeStamp.longValue()), ZoneId.of("Europe/Tallinn")));
 
-        for (Node attribute : stationData) {
-            switch (attribute.getNodeName()) {
-                case "name" -> weatherData.setStationName(stationData.get(0).getTextContent());
-                case "wmocode" -> weatherData.setWmoCode(Integer.parseInt(stationData.get(1).getTextContent()));
-                case "phenomenon" -> weatherData.setPhenomenon(stationData.get(2).getTextContent());
-                case "airtemperature" -> weatherData.setAirTemp(Float.parseFloat(stationData.get(3).getTextContent()));
-                case "windspeed" -> weatherData.setWindSpeed(Float.parseFloat(stationData.get(4).getTextContent()));
+        for (Node dataPoint : stationData) {
+            switch (dataPoint.getNodeName()) {
+                case "name" -> weatherData.setStationName(dataPoint.getTextContent());
+                case "wmocode" -> weatherData.setWmoCode(Integer.parseInt(dataPoint.getTextContent()));
+                case "phenomenon" -> weatherData.setPhenomenon(dataPoint.getTextContent());
+                case "airtemperature" -> weatherData.setAirTemp(Float.parseFloat(dataPoint.getTextContent()));
+                case "windspeed" -> weatherData.setWindSpeed(Float.parseFloat(dataPoint.getTextContent()));
             }
         }
         return weatherData;

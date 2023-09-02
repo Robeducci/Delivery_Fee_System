@@ -4,10 +4,11 @@
         <meta charset="UTF-8">
         <title>Set Delivery</title>
         <link rel="stylesheet" href="styles.css">
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     </head>
     <body>
         <div class="menu">
-            <form id="inputForm" action="/delivery" method="post">
+            <form id="inputForm">
                 <label for="station">Choose a City:</label>
 
                 <select name="station" id="station" class="select">
@@ -22,12 +23,31 @@
                     <option value="scooter">scooter</option>
                     <option value="bike">bike</option>
                 </select>
-                <div class="select">
+
+                <div id="date_menu" class="select">
                     <label for="date">(Optional) Choose a date:</label>
                     <input type="datetime-local" name="date" id="date"/>
                 </div>
                 <button type="submit" >Submit</button>
             </form>
         </div>
+    <script>
+        $("form#inputForm").submit(function() {
+            var mydata = $("form#inputForm").serialize();
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/delivery",
+                data: mydata,
+                success: function(response) {
+                    console.log("success");
+                    alert(response);
+                },
+                error: function() {
+                    console.log("error");
+                }
+            });
+            return false;
+        });
+    </script>
     </body>
 </html>

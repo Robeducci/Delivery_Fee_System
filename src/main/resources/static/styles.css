@@ -10,3 +10,9 @@
     margin-right: auto;
     margin-bottom: 1rem;
 }
+
+#date_menu {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

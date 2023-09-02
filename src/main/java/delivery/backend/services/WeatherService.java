@@ -24,7 +24,7 @@ public class WeatherService {
 
 
     /**
-     * Getting the latest weather data from the weather station near the chosen city using station's wmo code.
+     * Getting the weather data from the weather station near the chosen city using station's wmo code.
      *
      * If a date is not chosen:
      *              First find all the weather reports from the chosen station, then
@@ -54,6 +54,7 @@ public class WeatherService {
             return Optional.of(weatherData).get()
                     .orElseThrow(() -> {throw new WeatherDataNotFoundException("Did not find weather data for station");});
         } else {
+
             LocalDateTime chosenDate = getLocalDateTimeFromString(date.get());
             return findClosestWeatherDataToDate(weatherReports, chosenDate);
         }

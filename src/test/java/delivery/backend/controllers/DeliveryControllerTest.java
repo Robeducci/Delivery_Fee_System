@@ -18,7 +18,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
     void testEmptyDatabaseError() throws Exception {
 
         MvcResult resTallinn = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", CAR)
                         .param("date", "")
@@ -37,7 +37,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // 6 different dates with different weather conditions
         // Latest has air temperature of -15'C
         MvcResult resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "")
@@ -52,7 +52,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
     void testWrongStationError() throws Exception {
         saveGoodWeatherDataToDatabase();
         MvcResult resTallinn = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", NARVA)
                         .param("vehicle", CAR)
                         .param("date", "")
@@ -69,7 +69,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         saveGoodWeatherDataToDatabase();
 
         MvcResult resTallinn = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", CAR)
                         .content(String.valueOf(MediaType.APPLICATION_FORM_URLENCODED)))
@@ -79,7 +79,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         Assertions.assertEquals("4.0 €", resTallinn.getResponse().getContentAsString());
 
         MvcResult resTartu = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TARTU)
                         .param("vehicle", CAR)
                         .param("date", "")
@@ -90,7 +90,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         Assertions.assertEquals("3.5 €", resTartu.getResponse().getContentAsString());
 
         MvcResult resParnu = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", PARNU)
                         .param("vehicle", CAR)
                         .param("date", "")
@@ -108,7 +108,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Tallinn - Rain and -2'C
         MvcResult resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "")
@@ -120,7 +120,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Tartu - wind between 10m/s and 20m/s and snow
         MvcResult resTartuBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TARTU)
                         .param("vehicle", BIKE)
                         .param("date", "")
@@ -132,7 +132,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Pärnu - -20'C
         MvcResult resParnuScooter = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", PARNU)
                         .param("vehicle", SCOOTER)
                         .param("date", "")
@@ -150,7 +150,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Tallinn - Thunder
         MvcResult resTallinnScooter = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", SCOOTER)
                         .param("date", "")
@@ -163,7 +163,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Tartu - glaze and hail
         MvcResult resTartuScooter = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TARTU)
                         .param("vehicle", SCOOTER)
                         .param("date", "")
@@ -175,7 +175,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
 
         // Pärnu - wind speed > 20m/s
         MvcResult resParnuBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", PARNU)
                         .param("vehicle", BIKE)
                         .param("date", "")
@@ -194,7 +194,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 16/06/2023 14:09
         // Closest data should be 15/06/2023 15:15:00 - Rain
         MvcResult resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-06-16T14:09")
@@ -207,7 +207,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 29/06/2023 16:16
         // Closest data should be 30/06/2023 15:15:00 - Snow and -2'C
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-06-29T16:16")
@@ -220,7 +220,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 15/07/2023 11:30
         // Closest data should be 15/07/2023 11:15:00 - Thunder
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-07-15T11:30")
@@ -233,7 +233,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 15/07/2023 11:45
         // Closest data should be 15/07/2023 12:15:00 - Wind speed is 15 m/s
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-07-15T11:45")
@@ -246,7 +246,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 31/07/2023 12:29
         // Closest data should be 30/07/2023 15:15:00 - Air Temperature is -2'C
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-07-31T12:29")
@@ -259,7 +259,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 14/08/2023 17:29
         // Closest data should be 15/08/2023 15:15:00 - Air Temperature is -15'C
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-08-14T17:29")
@@ -278,7 +278,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is 17/06/2023 17:09:42
         // Closest data should be 15/06/2023 15:15:00, but dates are more than 1 day apart
         MvcResult resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", "2023-06-17T17:01")
@@ -291,7 +291,7 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
         // Chosen date is always Tomorrow
         LocalDateTime chosenDate = LocalDateTime.now().plusDays(1);
         resTallinnBike = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/delivery")
+                        .get("/delivery")
                         .param("station", TALLINN)
                         .param("vehicle", BIKE)
                         .param("date", chosenDate.toString())

@@ -7,7 +7,7 @@ import delivery.backend.exceptions.WeatherDataNotFoundException;
 import delivery.backend.exceptions.WrongDateException;
 import delivery.backend.services.DeliveryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,9 +24,9 @@ public class DeliveryController {
     /**
      * Endpoint for calculating the delivery fee based on station (City), vehicle type and (Optional) date.
      *
-     * The Parameters are sent using POST.
-     * With station and vehicle a Delivery object is constructed with which the calculation of the fee is done
-     * using DeliveryService method called "calculateDeliveryFee" with the latest weather data.
+     * The Parameters are sent using GET.
+     * With station and vehicle type a Delivery object is constructed with which the calculation of the fee is done
+     * using DeliveryService method called "calculateDeliveryFee" that uses the latest weather data.
      *
      * If a date is given then the fee is calculated with weather data which has the closest import date to the
      * chosen date.
@@ -36,7 +36,7 @@ public class DeliveryController {
      * @param date Chosen date on which the fee calculations should be done.
      * @return An error message or the calculated delivery fee.
      */
-    @PostMapping("/delivery")
+    @GetMapping("/delivery")
     public String getDeliveryFee(@RequestParam(name = "station") String wmoCode,
                                  @RequestParam(name = "vehicle") String vehicle,
                                  @RequestParam(required = false, name = "date") String date) {

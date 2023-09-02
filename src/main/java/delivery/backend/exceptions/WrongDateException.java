@@ -3,7 +3,7 @@ package delivery.backend.exceptions;
 public class WrongDateException extends RuntimeException {
 
     /**
-     * Exception that is thrown when the customer select a future date or a date we do not have data on.
+     * Exception that is thrown when the customer has selected a future date or a date on which there is no data.
      * @param error message.
      */
     public WrongDateException(String error) {
