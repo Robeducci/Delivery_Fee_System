@@ -19,4 +19,4 @@ Now go to `localhost:8080` and you can start calculating delivery fees.
 ____
 ### Tests
 To run tests you can use `.\gradlew clean test`   
-or to see coverage right-click on `src/test > More Run/Debug > Run ... With Coverage` 
+or to see coverage in Intellij right-click on `src/test > More Run/Debug > Run ... With Coverage` 
