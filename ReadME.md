@@ -1,6 +1,5 @@
-##DELIVERY FEE CALCULATOR
+## DELIVERY FEE CALCULATOR
 _____
-
 ### Problems:
 Problem when configuring root project - This project uses Java 17, make sure your Java and Gradle JVM is set to
 17 or higher.
