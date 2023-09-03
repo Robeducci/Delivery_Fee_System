@@ -184,6 +184,19 @@ class DeliveryControllerTest extends DeliveryApplicationTestBase {
                 .andReturn();
 
         Assertions.assertEquals(FORBIDDENERROR, resParnuBike.getResponse().getContentAsString());
+
+        // Tallinn - Thunder
+        // Car can still make deliveries in bad weather
+        MvcResult resTallinnCar = mockMvc.perform(MockMvcRequestBuilders
+                        .get("/delivery")
+                        .param("station", TALLINN)
+                        .param("vehicle", CAR)
+                        .param("date", "")
+                        .content(String.valueOf(MediaType.APPLICATION_FORM_URLENCODED)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Assertions.assertEquals("4.0 €", resTallinnCar.getResponse().getContentAsString());
     }
 
     @Test

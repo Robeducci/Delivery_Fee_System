@@ -43,16 +43,23 @@ public class DeliveryService {
         WeatherData weatherData = weatherService.getWeatherData(delivery.getStation().getWmoCode(), date);
 
         double fee = getRegionalBaseFee(delivery);
-        double atef = calculateAirTemperatureFee(weatherData.getAirTemp());
-        double wpef = calculateWeatherPhenomenon(weatherData.getPhenomenon().toLowerCase());
-        double wsef = calculateWindSpeedFee(weatherData.getWindSpeed());
+        double atef = 0;
+        double wpef = 0;
+        double wsef = 0;
 
         switch (delivery.getVehicle()) {
-            case SCOOTER -> fee += atef + wpef;
-            case BIKE -> fee += atef + wsef + wpef;
+            case SCOOTER -> {
+                atef = calculateAirTemperatureFee(weatherData.getAirTemp());
+                wpef = calculateWeatherPhenomenon(weatherData.getPhenomenon().toLowerCase());
+            }
+            case BIKE -> {
+                atef = calculateAirTemperatureFee(weatherData.getAirTemp());
+                wpef = calculateWeatherPhenomenon(weatherData.getPhenomenon().toLowerCase());
+                wsef = calculateWindSpeedFee(weatherData.getWindSpeed());
+            }
         }
 
-        return fee + " €";
+        return fee + atef + wpef + wsef + " €";
     }
 
     private double getRegionalBaseFee(Delivery delivery) {
